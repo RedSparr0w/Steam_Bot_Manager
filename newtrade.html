@@ -1,0 +1,46 @@
+<html>
+<head>
+	<title>Steam Card Farmer</title>
+    <link rel="stylesheet" href="./include/css/bootstrap.min.css">
+	<!-- Normalize CSS -->
+    <link rel="stylesheet" href="./include/css/normalize.css">
+	<!-- Fort Awesome CSS -->
+	<link rel="stylesheet" href="./include/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./include/css/main.css">
+    <script src="./include/js/jquery.min.js"></script>
+	<script src="./include/js/tether.min.js"></script>
+	<script src="./include/js/bootstrap.min.js"></script>
+</head>
+<body style="-webkit-user-select: none;">
+	<div id="Menu">
+		<div id="WindowDragable" style="-webkit-app-region: drag;">
+			<h4><i class="fa fa-steam"></i> New Trade Offer</h4>
+		</div>
+		<div id="Controls">
+			<a href="#" id="AppClose" onclick="window.close();" style="right:0px;">
+				<i class="fa fa-times"></i>
+			</a>
+		</div>
+	</div>
+	<div id="TradeWindow" class="Window">
+		<div id="OtherUser"class="col-sm-6 col-xs-12">
+			<h3>Their items:</h3>
+		</div>
+		<div id="CurrentUser" class="col-sm-6 col-xs-12">
+			<h3>Us</h3>
+		</div>
+		<button id="accept" class="btn btn-success trade-btn col-xs-6" value="accept">Accept</button>
+		<button id="decline" class="btn btn-danger trade-btn col-xs-6" value="decline">Decline</button>
+	</div>
+	<style>
+	#TradeWindow .item {
+		background-color: rgba(0, 0, 0, 0.35);
+		padding: 0;
+		margin-bottom: 3px;
+	}
+	#TradeWindow .item .info {
+		margin-top: 4%;
+	}
+	</style>
+</body>
+</html>
