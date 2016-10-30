@@ -27,6 +27,7 @@ var admin={
 	"accountID": "16663071",
 	"steamID64": "76561197976928799"
 }
+
 // all bots
 var bots = JSON.parse(fs.readFileSync('bots.json'));
 var newBot = function(bot,v){
@@ -49,19 +50,18 @@ var newBot = function(bot,v){
 		"accountName": v.accountName,
 		"password": v.password
 	});
-	if (v.hasOwnProperty("identity_secret") && v.identity_secret.length > 0){
-		v.client.on('webSession', function(sessionID, cookies) {
-			v.manager.setCookies(cookies, function(err) {
-				if (err) {
-					console.log(err);
-					process.exit(1); // Fatal error since we couldn't get our API key
-					return;
-				}
-			});
-			v.community.setCookies(cookies);
-			v.community.startConfirmationChecker(30000, v.identity_secret); // Checks and accepts confirmations every 30 seconds
+	
+	v.client.on('webSession', function(sessionID, cookies) {
+		v.manager.setCookies(cookies, function(err) {
+			if (err) {
+				console.log(err);
+				process.exit(1); // Fatal error since we couldn't get our API key
+				return;
+			}
 		});
-	}
+		v.community.setCookies(cookies);
+		v.community.startConfirmationChecker(30000, v.identity_secret); // Checks and accepts confirmations every 30 seconds
+	});
 	
 	v.manager.on('newOffer', function(offer) {
 		console.log("New offer #" + offer.id + " from " + offer.partner.getSteamID64());
@@ -148,21 +148,16 @@ var newBot = function(bot,v){
 	v.manager.on('pollData', function(pollData) {
 		fs.writeFile('polldata/'+bot+'_polldata.json', JSON.stringify(pollData));
 	});
-	v.client.on('steamGuard', function(domain, callback, incorrect) {
-		if (domain !== null ){
+	v.client.on('steamGuard', function(domain, callback, lastcode) {
+		if (domain != null ){
 			auth_msg = bot+" Auth Code\nEmailed to address *******@" + domain + ":";
-		} else if( v.hasOwnProperty("shared_secret") && !incorrect ){
+		} else if( v.hasOwnProperty("shared_secret") && !lastcode ){
 			callback(SteamUser.generateAuthCode(v.shared_secret));
 			return;
 		}else {
 			auth_msg = bot+" Mobile Auth Code:";
 		}
-		var authCode = prompt(auth_msg);
-		if (authCode !== null && authCode.length > 0){
-			callback(authCode);
-		}else{
-			return;
-		}
+		callback(prompt(auth_msg));
 	});
 	v.client.on('loggedOn', function() {
 		v.client.setPersona(1);
@@ -183,7 +178,7 @@ var newBot = function(bot,v){
 		v.community.getSteamUser(v.client.steamID,function(err,data){
 			v.avatar = "http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/5f/"+data.avatarHash+"_full.jpg";
 			v.name = name;
-			$('#MultiAppsWindow').show().find('ul').append('<li id="'+v.accountName+'"><div class="li-img"><img src="'+v.avatar+'" alt="'+name+'" /></div><div class="li-text"><h4 class="li-head">'+name+'</h4><p class="li-sub">Sub heading</p></div></li>');
+			$('#MultiAppsWindow').show().find('ul').append('<li id="'+v.accountName+'"><div class="li-img"><img src="'+v.avatar+'" alt="'+name+'" /></div><div class="li-text"><h4 class="li-head">'+name+'</h4><p class="li-sub"></p></div></li>');
 			if ( v.hasOwnProperty("shared_secret") ){
 				$("#"+v.accountName+" img").click(function(){
 					var AuthCode = SteamUser.generateAuthCode(v.shared_secret);
@@ -194,17 +189,53 @@ var newBot = function(bot,v){
 			$('#'+v.accountName+' .li-img img').attr("class","online");
 			//Setup Bot Menu
 			v.menu = new gui.Menu();
-			v.menu.append(new gui.MenuItem({
-				label: 'Go Offline',
+
+			var setStatusMenu = new gui.Menu();
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Online',
 				click: function() {
-					v.client.setPersona(0);
+					v.client.setPersona(SteamUser.EPersonaState.Online);
+				} 
+			}));
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Busy',
+				click: function() {
+					v.client.setPersona(SteamUser.EPersonaState.Busy);
+				} 
+			}));
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Away',
+				click: function() {
+					v.client.setPersona(SteamUser.EPersonaState.Away);
+				} 
+			}));
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Snooze',
+				click: function() {
+					v.client.setPersona(SteamUser.EPersonaState.Snooze);
+				} 
+			}));
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Looking to Trade',
+				click: function() {
+					v.client.setPersona(SteamUser.EPersonaState.LookingToTrade);
+				} 
+			}));
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Looking to Play',
+				click: function() {
+					v.client.setPersona(SteamUser.EPersonaState.LookingToPlay);
+				} 
+			}));
+			setStatusMenu.append(new gui.MenuItem({
+				label: 'Offline',
+				click: function() {
+					v.client.setPersona(SteamUser.EPersonaState.Offline);
 				} 
 			}));
 			v.menu.append(new gui.MenuItem({
-				label: 'Go Online',
-				click: function() {
-					v.client.setPersona(1);
-				} 
+				label: 'Set Status',
+				submenu: setStatusMenu
 			}));
 			v.menu.append(new gui.MenuItem({ type: 'separator' }));
 			v.menu.append(new gui.MenuItem({
@@ -213,7 +244,7 @@ var newBot = function(bot,v){
 					v.logOff();
 				} 
 			}));
-
+			
 			$('#'+v.accountName).on('contextmenu', function(ev) { 
 				ev.preventDefault();
 				v.menu.popup(ev.pageX, ev.pageY);
@@ -448,9 +479,9 @@ var newBot = function(bot,v){
 						v.checkMinPlaytime();
 					} else {
 						new Notification("Steam Card Farmer: "+bot,{body:"All card drops recieved!",icon: v.avatar}).onclick = function(){this.close();};
-						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",440,570,730,365670,452780,466170]);
+						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",730,466170,452780]);
 						$('#'+v.accountName+' .li-img img').attr("class","ingame");
-						$('#'+v.accountName+' .li-sub').html("Idling CS:GO, DOTA 2, TF 2, Blender and Idle.<br>All card drops recieved!");
+						$('#'+v.accountName+' .li-sub').html("Idling CS:GO, Idle.<br>All card drops recieved!");
 					}
 				} else {
 					v.checkCardsInSeconds(1200); // 20 minutes to be safe, we should automatically check when Steam notifies us that we got a new item anyway
@@ -500,6 +531,7 @@ var newBot = function(bot,v){
 		}
 	});
 };
+
 //Close App
 var shutdown = function(code=0) {
 	/*

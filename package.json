@@ -1,7 +1,7 @@
 {
-  "name": "steam-card-farmer",
+  "name": "SBM-Dev",
   "version": "2.0.1",
-  "description": "Automatically farms card drops for Steam games you own with remaining drops",
+  "description": "Steam Bot Manager | Automatically farms card drops for Steam games you own with remaining drops | Accept trades | Redeem keys",
   "dependencies": {
     "cheerio": "^0.18.0",
     "steam-user": "^3.9.0",
@@ -12,9 +12,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "start" : "nwbuild -r \"./\"",
+    "test" : "nwbuild -r \"./\"",
 	"preinstall": "npm list nw-builder -g || npm install nw-builder -g",
-	"build": "nwbuild -o \"../builds\" -p win64,win32 --winIco \"./logo.ico\" \"./\""
+	"build": "node build.js"
   },
   "main": "index.html", 
   "window": {
@@ -22,7 +22,6 @@
     "toolbar": false,
 	"width": 350,
 	"height": 450,
-	"resizable": false,
     "position": "center",
     "min_width": 350,
     "min_height": 450,

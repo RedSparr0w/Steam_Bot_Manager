@@ -3,6 +3,6 @@
 		"accountName": "required",
 		"password": "required",
 		"shared_secret": "optional_AutoMobileAuth",
-		"identity_secret": "optional_Confirmations",
+		"identity_secret": "optional_Confirmations"
 	}
 }
