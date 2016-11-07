@@ -171,6 +171,7 @@ var newBot = function(bot,v){
 
 	v.client.once('appOwnershipCached', function() {
 		log("Got app ownership info");
+		v.client.setPersona(SteamUser.EPersonaState[(v.state !== undefined ? v.state : "Online")]);
 		v.checkMinPlaytime();
 	});
 	
@@ -465,7 +466,7 @@ var newBot = function(bot,v){
 						console.log(bot+" idling \"" + title + "\"\n" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining");
 						$('#'+v.accountName+' .li-sub').html("Idling " + title + "<br>" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining").onclick = function(){this.close();};
 						new Notification("Steam Card Farmer "+bot,{body:"Idling \"" + title + "\"\n" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining",icon: v.avatar}).onclick = function(){this.close();};
-						v.client.gamesPlayed(parseInt(appid, 10));
+						v.client.gamesPlayed(["Farming Steam Cards",parseInt(appid, 10)]);
 						$('#'+v.accountName+' .li-img img').attr("class","ingame");
 					}
 				}
@@ -479,9 +480,9 @@ var newBot = function(bot,v){
 						v.checkMinPlaytime();
 					} else {
 						new Notification("Steam Card Farmer: "+bot,{body:"All card drops recieved!",icon: v.avatar}).onclick = function(){this.close();};
-						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",730,466170,452780]);
+						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",440,570,730,365670,452780,466170,452780]);
 						$('#'+v.accountName+' .li-img img').attr("class","ingame");
-						$('#'+v.accountName+' .li-sub').html("Idling CS:GO, Idle.<br>All card drops recieved!");
+						$('#'+v.accountName+' .li-sub').html("Idling Hours<br>All card drops recieved!");
 					}
 				} else {
 					v.checkCardsInSeconds(1200); // 20 minutes to be safe, we should automatically check when Steam notifies us that we got a new item anyway
