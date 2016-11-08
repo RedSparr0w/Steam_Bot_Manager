@@ -56,6 +56,8 @@ bots.json
 # Ignore Polldata/Trades
 polldata/*
 
+cache/*
+
 # save custom file changes
 !node_modules/
 node_modules/*
