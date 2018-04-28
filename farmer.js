@@ -473,16 +473,16 @@ var newBot = function(bot,v){
 				//fadeout loading window
 				console.log(bot+" " + totalDropsLeft + " card drop" + (totalDropsLeft == 1 ? '' : 's') + " remaining across " + appsWithDrops + " app" + (appsWithDrops == 1 ? '' : 's') + " (Page " + v.g_Page + ")");
 				if(totalDropsLeft == 0) {
-					if ($_('.badge_row').length == 250){
+					if ($_('.badge_row').length == 150){
 						log(bot+" no drops remaining on page "+v.g_Page);
 						v.g_Page++;
 						log(bot+" checking page "+v.g_Page);
 						v.checkMinPlaytime();
 					} else {
 						new Notification("Steam Card Farmer: "+bot,{body:"All card drops recieved!",icon: v.avatar}).onclick = function(){this.close();};
-						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",440,570,730,365670,452780,466170,452780]);
 						$('#'+v.accountName+' .li-img img').attr("class","ingame");
 						$('#'+v.accountName+' .li-sub').html("Idling Hours<br>All card drops recieved!");
+						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",440,570,730,365670,452780,466170,452780]);
 					}
 				} else {
 					v.checkCardsInSeconds(1200); // 20 minutes to be safe, we should automatically check when Steam notifies us that we got a new item anyway
