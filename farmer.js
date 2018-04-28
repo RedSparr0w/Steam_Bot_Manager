@@ -257,8 +257,8 @@ var newBot = function(bot,v){
 	
 	v.client.on('error', function(e) {
 		$('#'+v.accountName+' .li-img img').attr("class","offline");
-		console.log(bot+" Error: " + e);
-		if (e == "Error: LoggedInElsewhere" || e=="Error: LogonSessionReplaced"){
+		console.error(`${bot} Error:\n`, e.message + '\n', [e]);
+		if (e.message == "LoggedInElsewhere" || e.message == "LogonSessionReplaced"){
 			$('#'+v.accountName+' .li-sub').html("In Game Elsewhere!");
 			return;
 		}else{
