@@ -12,16 +12,19 @@
   },
   "license": "MIT",
   "scripts": {
-    "test" : "nwbuild -r \"./\"",
-	"preinstall": "npm list nw-builder -g || npm install nw-builder -g",
-	"build": "node build.js"
+    "start": "nwbuild -r \"./\" -p \"win32\"",
+    "start:linux": "nwbuild -r \"./\" -p \"linux32\"",
+    "start:osx": "nwbuild -r \"./\" -p \"osx32\"",
+    "preinstall": "npm list nw-builder -g || npm install nw-builder -g",
+    "build": "nwbuild -o \"../builds\" -p win64,win32 --winIco \"./logo.ico\" \"./\""
   },
-  "main": "index.html", 
+  "main": "index.html",
   "window": {
     "frame": false,
     "toolbar": false,
-	"width": 350,
-	"height": 450,
+    "width": 350,
+    "height": 450,
+    "resizable": false,
     "position": "center",
     "min_width": 350,
     "min_height": 450,
