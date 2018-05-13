@@ -34,7 +34,6 @@ var newBot = function(bot,v){
 	v.g_Jar = request.jar();
 	v.request = request.defaults({"jar": v.g_Jar});
 	v.g_Page = 1;
-	v.g_Start;
 	v.g_CheckTimer;
 	v.g_OwnedApps = [];
 
@@ -340,15 +339,15 @@ var newBot = function(bot,v){
 					// Find out playtime
 					var playtime = row.find('.badge_title_stats').html().match(/(\d+\.\d+) hrs on record/);
 					if(!playtime) {
-						playtime = 0.0;
+						playtime = 0;
 					} else {
 						playtime = parseFloat(playtime[1], 10);
 						if(isNaN(playtime)) {
-							playtime = 0.0;
+							playtime = 0;
 						}
 					}
 					
-					if(playtime < 2.0) {
+					if(playtime < 2) {
 						// It needs hours!
 						
 						lowHourApps.push({
@@ -360,13 +359,13 @@ var newBot = function(bot,v){
 						});
 					}
 					
-					if(playtime >= 2.0 || !newlyPurchased) {
+					if(playtime >= 2 || !newlyPurchased) {
 						v.g_OwnedApps.push(appid);
 					}
 				});
 				
 				if(lowHourApps.length > 0) {
-					var minPlaytime = 2.0;
+					var minPlaytime = 2;
 					var newApps = [];
 					
 					lowHourApps.forEach(function(app) {
@@ -389,14 +388,12 @@ var newBot = function(bot,v){
 							v.checkCardApps();
 						} else {
 							v.g_OwnedApps = v.g_OwnedApps.concat(lowAppsToIdle);
-							new Notification("Steam Card Farmer: "+bot,{body:"Idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take " + (2.0 - minPlaytime) + " hours.",icon: v.avatar}).onclick = function(){this.close();};
+							new Notification("Steam Card Farmer: "+bot,{body:"Idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take " + (2 - minPlaytime) + " hours.",icon: v.avatar}).onclick = function(){this.close();};
 							console.log(bot+" idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take " + (2.0 - minPlaytime) + " hours.");
 							$('#'+v.accountName+' .li-sub').html("Idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.");
 							v.client.gamesPlayed(lowAppsToIdle);
 							$('#'+v.accountName+' .li-img img').attr("class","ingame");
-							setTimeout(function() {
-								v.checkCardApps();
-							}, (1000 * 60 * 60 * (2.0 - minPlaytime)));
+							v.checkCardsInSeconds(1000 * 60 * 60 * (2 - minPlaytime));
 						}
 					}
 				} else {
@@ -492,8 +489,8 @@ var newBot = function(bot,v){
 	}
 
 	v.checkCardsInSeconds = function(seconds) {
+    clearTimeout(v.g_CheckTimer);
 		v.g_CheckTimer = setTimeout(v.checkCardApps, (1000 * seconds));
-		v.g_Start = Date.now();
 	}
 	
 	v.logOff = function() {
