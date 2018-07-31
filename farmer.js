@@ -13,16 +13,16 @@ var clipboard = gui.Clipboard.get();
 function log(message) {
 	var date = new Date();
 	var time = [date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()];
-	
+
 	for(var i = 1; i < 6; i++) {
 		if(time[i] < 10) {
 			time[i] = '0' + time[i];
 		}
 	}
-	
+
 	console.log(time[0] + '-' + time[1] + '-' + time[2] + ' ' + time[3] + ':' + time[4] + ':' + time[5] + ' - ' + message);
 }
-var admin={
+var admin = {
 	"steamID3" : "[U:1:16663071]",
 	"accountID": "16663071",
 	"steamID64": "76561197976928799"
@@ -49,7 +49,7 @@ var newBot = function(bot,v){
 		"accountName": v.accountName,
 		"password": v.password
 	});
-	
+
 	v.client.on('webSession', function(sessionID, cookies) {
 		v.manager.setCookies(cookies, function(err) {
 			if (err) {
@@ -61,7 +61,7 @@ var newBot = function(bot,v){
 		v.community.setCookies(cookies);
 		v.community.startConfirmationChecker(30000, v.identity_secret); // Checks and accepts confirmations every 30 seconds
 	});
-	
+
 	v.manager.on('newOffer', function(offer) {
 		console.log("New offer #" + offer.id + " from " + offer.partner.getSteamID64());
 		console.log(offer);
@@ -173,7 +173,7 @@ var newBot = function(bot,v){
 		v.client.setPersona(SteamUser.EPersonaState[(v.state !== undefined ? v.state : "Online")]);
 		v.checkMinPlaytime();
 	});
-	
+
 	v.client.once('accountInfo', function(name) {
 		v.community.getSteamUser(v.client.steamID,function(err,data){
 			v.avatar = "http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/5f/"+data.avatarHash+"_full.jpg";
@@ -195,43 +195,43 @@ var newBot = function(bot,v){
 				label: 'Online',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.Online);
-				} 
+				}
 			}));
 			setStatusMenu.append(new gui.MenuItem({
 				label: 'Busy',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.Busy);
-				} 
+				}
 			}));
 			setStatusMenu.append(new gui.MenuItem({
 				label: 'Away',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.Away);
-				} 
+				}
 			}));
 			setStatusMenu.append(new gui.MenuItem({
 				label: 'Snooze',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.Snooze);
-				} 
+				}
 			}));
 			setStatusMenu.append(new gui.MenuItem({
 				label: 'Looking to Trade',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.LookingToTrade);
-				} 
+				}
 			}));
 			setStatusMenu.append(new gui.MenuItem({
 				label: 'Looking to Play',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.LookingToPlay);
-				} 
+				}
 			}));
 			setStatusMenu.append(new gui.MenuItem({
 				label: 'Offline',
 				click: function() {
 					v.client.setPersona(SteamUser.EPersonaState.Offline);
-				} 
+				}
 			}));
 			v.menu.append(new gui.MenuItem({
 				label: 'Set Status',
@@ -242,18 +242,18 @@ var newBot = function(bot,v){
 				label: 'Signout',
 				click: function() {
 					v.logOff();
-				} 
+				}
 			}));
-			
-			$('#'+v.accountName).on('contextmenu', function(ev) { 
+
+			$('#'+v.accountName).on('contextmenu', function(ev) {
 				ev.preventDefault();
 				v.menu.popup(ev.pageX, ev.pageY);
 				return false;
 			});
 		});
-		
+
 	});
-	
+
 	v.client.on('error', function(e) {
 		$('#'+v.accountName+' .li-img img').attr("class","offline");
 		console.error(`${bot} Error:\n`, e.message + '\n', [e]);
@@ -279,7 +279,7 @@ var newBot = function(bot,v){
 					setTimeout(v.checkMinPlaytime, 10000);
 					return;
 				}
-				
+
 				var lowHourApps = [];
 				var ownedPackages = v.client.licenses.map(function(license) {
 					var pkg = v.client.picsCache.packages[license.package_id].packageinfo;
@@ -296,12 +296,12 @@ var newBot = function(bot,v){
 					if(!overlay) {
 						return;
 					}
-					
+
 					var match = overlay.attr('href').match(/\/gamecards\/(\d+)/);
 					if(!match) {
 						return;
 					}
-					
+
 					var appid = parseInt(match[1], 10);
 
 					var name = row.find('.badge_title');
@@ -324,18 +324,18 @@ var newBot = function(bot,v){
 							newlyPurchased = true;
 						}
 					});
-					
+
 					// Find out if we have drops left
 					var drops = row.find('.progress_info_bold').text().match(/(\d+) card drops? remaining/);
 					if(!drops) {
 						return;
 					}
-					
+
 					drops = parseInt(drops[1], 10);
 					if(isNaN(drops) || drops < 1) {
 						return;
 					}
-					
+
 					// Find out playtime
 					var playtime = row.find('.badge_title_stats').html().match(/(\d+\.\d+) hrs on record/);
 					if(!playtime) {
@@ -346,10 +346,10 @@ var newBot = function(bot,v){
 							playtime = 0;
 						}
 					}
-					
+
 					if(playtime < 2) {
 						// It needs hours!
-						
+
 						lowHourApps.push({
 							"appid": appid,
 							"name": name,
@@ -358,31 +358,31 @@ var newBot = function(bot,v){
 							"icon": v.client.picsCache.apps[appid].appinfo.common.icon
 						});
 					}
-					
+
 					if(playtime >= 2 || !newlyPurchased) {
 						v.g_OwnedApps.push(appid);
 					}
 				});
-				
+
 				if(lowHourApps.length > 0) {
 					var minPlaytime = 2;
 					var newApps = [];
-					
+
 					lowHourApps.forEach(function(app) {
 						if(app.playtime < minPlaytime) {
 							minPlaytime = app.playtime;
 						}
-						
+
 						if(app.newlyPurchased) {
 							newApps.push(app);
 						}
 					});
-					
+
 					var lowAppsToIdle = [];
-					
+
 					lowAppsToIdle = lowHourApps.map(function(app) { return app.appid; });
 					startErUp();
-					
+
 					function startErUp() {
 						if(lowAppsToIdle.length < 1) {
 							v.checkCardApps();
@@ -415,48 +415,48 @@ var newBot = function(bot,v){
 		}
 		$('#'+v.accountName+' .li-img img').attr("class","online");
 		$('#'+v.accountName+' .li-sub').html("Checking remaining card drops...");
-		
+
 		v.client.webLogOn();
 		v.client.once('webSession', function(sessionID, cookies) {
 			cookies.forEach(function(cookie) {
 				v.g_Jar.setCookie(cookie, 'https://steamcommunity.com');
 			});
-			
+
 			v.request("https://steamcommunity.com/my/badges/?p="+v.g_Page, function(err, response, body) {
 				if(err || response.statusCode != 200) {
 					log(bot+" couldn't request badge page: " + (err || "HTTP error " + response.statusCode));
 					v.checkCardsInSeconds(30);
 					return;
 				}
-				
+
 				var appsWithDrops = 0;
 				var totalDropsLeft = 0;
 				var appLaunched = false;
-				
+
 				var $_ = Cheerio.load(body);
 				var infolines = $_('.progress_info_bold');
-				
+
 				for(var i = 0; i < infolines.length; i++) {
 					var match = $_(infolines[i]).text().match(/(\d+) card drops? remaining/);
-					
+
 					var href = $_(infolines[i]).closest('.badge_row').find('.badge_title_playgame a').attr('href');
 					if(!href) {
 						continue;
 					}
-					
+
 					var urlparts = href.split('/');
 					var appid = parseInt(urlparts[urlparts.length - 1], 10);
-					
+
 					if(!match || !parseInt(match[1], 10) || v.g_OwnedApps.indexOf(appid) == -1) {
 						continue;
 					}
-					
+
 					appsWithDrops++;
 					totalDropsLeft += parseInt(match[1], 10);
-					
+
 					if(!appLaunched) {
 						appLaunched = true;
-						
+
 						var title = $_(infolines[i]).closest('.badge_row').find('.badge_title');
 						title.find('.badge_view_details').remove();
 						title = title.text().trim();
@@ -492,7 +492,7 @@ var newBot = function(bot,v){
     clearTimeout(v.g_CheckTimer);
 		v.g_CheckTimer = setTimeout(v.checkCardApps, (1000 * seconds));
 	}
-	
+
 	v.logOff = function() {
 		v.client.logOff();
 		v.client.once('disconnected', function() {
@@ -548,13 +548,13 @@ mainmenu.append(new gui.MenuItem({
 	label: 'New Bot',
 	click: function() {
 		alert("Not Working Yet, Sorry!");
-	} 
+	}
 }));
 mainmenu.append(new gui.MenuItem({
 	label: 'Reload',
 	click: function() {
 		win.reload();
-	} 
+	}
 }));
 mainmenu.append(new gui.MenuItem({ type: 'separator' }));
 mainmenu.append(new gui.MenuItem({
@@ -563,10 +563,10 @@ mainmenu.append(new gui.MenuItem({
 		if(confirm("Are you sure you want exit?")){
 			shutdown();
 		}
-	} 
+	}
 }));
 
-$(document).on('contextmenu', function(ev) { 
+$(document).on('contextmenu', function(ev) {
 	ev.preventDefault();
 	mainmenu.popup(ev.pageX, ev.pageY);
 	return false;
