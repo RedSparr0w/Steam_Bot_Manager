@@ -1,9 +1,14 @@
 var NwBuilder = require('nw-builder');
 var nw = new NwBuilder({
-  files: ['./**','!./bots.json','!./node_modules/nw-builder/**','!./cache/**'], // use the glob format
+  files: [
+    './**',
+    '!./bots.js',
+    '!./node_modules/nw-builder/**',
+    '!./cache/**'
+  ], // use the glob format
   platforms: [ 'win'],
-  buildDir: "../builds",
-  winIco: "./logo.ico",
+  buildDir: '../builds',
+  winIco: './logo.ico',
   zip: false
 });
 

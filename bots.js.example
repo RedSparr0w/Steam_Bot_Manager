@@ -1,0 +1,10 @@
+module.exports = [
+  {
+    nickname: "My Main Account",
+    username: "required", // Account username
+    password: "required", // Account password
+    shared_secret: "optional", // Required for auto login with 2FA
+    identity_secret: "optional", // Required to confirm trade actions etc.
+    state: "Online", // Online, Offline etc.
+  },
+]

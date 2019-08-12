@@ -18,29 +18,24 @@ function dateTime(date = new Date()){
   return `${dateStr} ${timeStr}`;
 }
 
-function log(botname, message = '', ...args) {
-  if (!message){message = botname; botname = '';}
-  console.log('%s', `[log][${dateTime()}]${botname ? `[${botname}]` : ''}`, message);
+function log(botname, ...args) {
+  console.log('%s', `[log][${dateTime()}][${botname}]`, ...args);
 }
 
-function info(botname, message = '', ...args) {
-  if (!message){message = botname; botname = '';}
-  console.info('%c%s', 'color:#3498db', `[info][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+function info(botname, ...args) {
+  console.info('%c%s', 'color:#3498db', `[info][${dateTime()}][${botname}]`, ...args);
 }
 
-function debug(botname, message = '', ...args) {
-  if (!message){message = botname; botname = '';}
-  console.debug('%c%s', 'color:#7f8c8d', `[debug][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+function debug(botname, ...args) {
+  console.debug('%c%s', 'color:#7f8c8d', `[debug][${dateTime()}][${botname}]`, ...args);
 }
 
-function error(botname, message = '', ...args) {
-  if (!message){message = botname; botname = '';}
-  console.error('%c%s', 'color:#e74c3c', `[error][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+function warn(botname, ...args) {
+  console.warn('%c%s', 'color:#f39c12', `[warn][${dateTime()}][${botname}]`, ...args);
 }
 
-function warn(botname, message = '', ...args) {
-  if (!message){message = botname; botname = '';}
-  console.warn('%c%s', 'color:#f39c12', `[warn][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+function error(botname, ...args) {
+  console.error('%c%s', 'color:#e74c3c', `[error][${dateTime()}][${botname}]`, ...args);
 }
 
 var admin = {
@@ -50,7 +45,7 @@ var admin = {
 }
 
 // all bots
-var bots = JSON.parse(fs.readFileSync('bots.json'));
+var bots = require('./bots.js');
 var newBot = function(bot,v){
 	v.g_Jar = request.jar();
 	v.request = request.defaults({"jar": v.g_Jar});
@@ -67,9 +62,9 @@ var newBot = function(bot,v){
 	});
 	v.community = new SteamCommunity();
 	v.client.logOn({
-		"accountName": v.accountName,
-		"password": v.password
-	});
+      accountName: v.username,
+      password: v.password,
+    });
 
 	v.client.on('webSession', function(sessionID, cookies) {
 		v.manager.setCookies(cookies, function(err) {
@@ -162,12 +157,15 @@ var newBot = function(bot,v){
 		}
 		*/
 	});
+
 	if (fs.existsSync('polldata/'+bot+'_polldata.json')) {
 		v.manager.pollData = JSON.parse(fs.readFileSync('polldata/'+bot+'_polldata.json'));
 	}
+
 	v.manager.on('pollData', function(pollData) {
 		fs.writeFile('polldata/'+bot+'_polldata.json', JSON.stringify(pollData));
 	});
+
 	v.client.on('steamGuard', function(domain, callback, lastcode) {
 		if (domain != null ){
 			auth_msg = bot+" Auth Code\nEmailed to address *******@" + domain + ":";
@@ -189,7 +187,7 @@ var newBot = function(bot,v){
 		debug(bot, v.client);
 	});
 
-	v.client.once('appOwnershipCached', function() {
+	v.client.on('appOwnershipCached', function() {
 		debug(bot, "Got app ownership info");
 		v.client.setPersona(SteamUser.EPersonaState[(v.state !== undefined ? v.state : "Online")]);
 		v.checkMinPlaytime();
@@ -553,14 +551,14 @@ var newBot = function(bot,v){
 };
 
 //Close App
-var shutdown = function(code=0) {
+var shutdown = (code=0)=>{
 	/*
 	bots[bot].client.logOff();
 	bots[bot].client.once('disconnected', function() {
 		process.exit(code);
 	});
-*/
-	setTimeout(function() {
+  */
+	setTimeout(()=>{
 		process.exit(code);
 	}, 500);
 }
@@ -568,30 +566,33 @@ var shutdown = function(code=0) {
 //Right click menu
 mainmenu = new gui.Menu();
 mainmenu.append(new gui.MenuItem({
-	label: 'New Bot',
-	click: function() {
-		alert("Not Working Yet, Sorry!");
-	}
-}));
+    label: 'New Bot',
+    click: ()=>{
+      alert("Not Working Yet, Sorry!");
+    }
+  }));
 mainmenu.append(new gui.MenuItem({
-	label: 'Reload',
-	click: function() {
-		win.reload();
-	}
-}));
+    label: 'Reload',
+    click: ()=>{
+      win.reload();
+    }
+  }));
 mainmenu.append(new gui.MenuItem({ type: 'separator' }));
 mainmenu.append(new gui.MenuItem({
-	label: 'Exit',
-	click: function() {
-		if(confirm("Are you sure you want exit?")){
-			shutdown();
-		}
-	}
-}));
+    label: 'Exit',
+    click: ()=>{
+      if(confirm("Are you sure you want exit?")){
+        shutdown();
+      }
+    }
+  }));
 
 $(document).on('contextmenu', function(ev) {
 	ev.preventDefault();
 	mainmenu.popup(ev.pageX, ev.pageY);
 	return false;
 });
-$.each(bots,function(name,value){newBot(name,value);});
+
+bots.forEach(bot => {
+  newBot(bot.nickname, bot);
+});

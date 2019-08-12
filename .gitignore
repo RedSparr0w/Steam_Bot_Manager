@@ -51,7 +51,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # Ignore Bots Data
-bots.json
+bots.js
 
 # Ignore Polldata/Trades
 polldata/*
