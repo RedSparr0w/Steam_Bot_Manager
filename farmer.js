@@ -10,18 +10,39 @@ var gui = require('nw.gui'); //or global.window.nwDispatcher.requireNwGui() (see
 // Get the current window
 var win = gui.Window.get();
 var clipboard = gui.Clipboard.get();
-function log(message) {
-	var date = new Date();
-	var time = [date.getFullYear(), date.getMonth() + 1, date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()];
 
-	for(var i = 1; i < 6; i++) {
-		if(time[i] < 10) {
-			time[i] = '0' + time[i];
-		}
-	}
-
-	console.log(time[0] + '-' + time[1] + '-' + time[2] + ' ' + time[3] + ':' + time[4] + ':' + time[5] + ' - ' + message);
+function dateTime(date = new Date()){
+  const padNum = num => num.toString().padStart(2, 0);
+  const dateStr = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(padNum).join('-');
+  const timeStr = [date.getHours(), date.getMinutes(), date.getSeconds()].map(padNum).join(':');
+  return `${dateStr} ${timeStr}`;
 }
+
+function log(botname, message = '', ...args) {
+  if (!message){message = botname; botname = '';}
+  console.log('%s', `[log][${dateTime()}]${botname ? `[${botname}]` : ''}`, message);
+}
+
+function info(botname, message = '', ...args) {
+  if (!message){message = botname; botname = '';}
+  console.info('%c%s', 'color:#3498db', `[info][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+}
+
+function debug(botname, message = '', ...args) {
+  if (!message){message = botname; botname = '';}
+  console.debug('%c%s', 'color:#7f8c8d', `[debug][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+}
+
+function error(botname, message = '', ...args) {
+  if (!message){message = botname; botname = '';}
+  console.error('%c%s', 'color:#e74c3c', `[error][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+}
+
+function warn(botname, message = '', ...args) {
+  if (!message){message = botname; botname = '';}
+  console.warn('%c%s', 'color:#f39c12', `[warn][${dateTime()}]${botname ? `[${botname}]` : ''}`, message, ...args);
+}
+
 var admin = {
 	"steamID3" : "[U:1:16663071]",
 	"accountID": "16663071",
@@ -37,7 +58,7 @@ var newBot = function(bot,v){
 	v.g_CheckTimer;
 	v.g_OwnedApps = [];
 
-	v.client = new SteamUser({"enablePicsCache": true,"promptSteamGuardCode":false});
+	v.client = new SteamUser({"enablePicsCache": true, "promptSteamGuardCode": false});
 
 	v.manager = new TradeOfferManager({
 		"steam": v.client, // Polling every 30 seconds is fine since we get notifications from Steam
@@ -53,7 +74,7 @@ var newBot = function(bot,v){
 	v.client.on('webSession', function(sessionID, cookies) {
 		v.manager.setCookies(cookies, function(err) {
 			if (err) {
-				console.log(err);
+				error(bot, err);
 				process.exit(1); // Fatal error since we couldn't get our API key
 				return;
 			}
@@ -63,16 +84,16 @@ var newBot = function(bot,v){
 	});
 
 	v.manager.on('newOffer', function(offer) {
-		console.log("New offer #" + offer.id + " from " + offer.partner.getSteamID64());
-		console.log(offer);
+		info(bot, "New offer #" + offer.id + " from " + offer.partner.getSteamID64());
+		info(bot, offer);
 		/*
 		if(offer.partner.getSteamID64() == admin.steamID64){
 			offer.accept(function(err) {
 				if (err) {
-					console.log("Unable to accept offer: " + err.message);
+					error(bot, "Unable to accept offer: " + err.message);
 				} else {
 					community.checkConfirmations(); // Check for confirmations right after accepting the offer
-					console.log("Offer accepted");
+					info(bot, "Offer accepted");
 				}
 			});
 		}else{
@@ -121,15 +142,15 @@ var newBot = function(bot,v){
 							if($(this).val()=="accept"){
 								offer.accept(function(err) {
 									if (err) {
-										console.log("Unable to accept offer: " + err.message);
+										error(bot, "Unable to accept offer: " + err.message);
 									} else {
 										v.community.checkConfirmations(); // Check for confirmations right after accepting the offer
-										console.log("Offer accepted");
+										info(bot, "Offer accepted");
 									}
 								});
 							}else if($(this).val()=="decline"){
 								offer.decline(function(err) {
-									console.log("Offer declined");
+									info(bot, "Offer declined");
 								});
 							}
 							tradewin.close();
@@ -162,14 +183,14 @@ var newBot = function(bot,v){
 		v.client.setPersona(1);
 		v.client.setUIMode(1);
 		$('#'+v.accountName+' .li-sub').html("Logged into Steam!");
-		log(bot+" Logged into Steam!");
+		info(bot, "Logged into Steam!");
 		$('#'+v.accountName+' .li-img img').attr("class","online");
-		log(bot+" Waiting for license info...");
-		console.log(v.client);
+		debug(bot, "Waiting for license info...");
+		debug(bot, v.client);
 	});
 
 	v.client.once('appOwnershipCached', function() {
-		log("Got app ownership info");
+		debug(bot, "Got app ownership info");
 		v.client.setPersona(SteamUser.EPersonaState[(v.state !== undefined ? v.state : "Online")]);
 		v.checkMinPlaytime();
 	});
@@ -256,7 +277,7 @@ var newBot = function(bot,v){
 
 	v.client.on('error', function(e) {
 		$('#'+v.accountName+' .li-img img').attr("class","offline");
-		console.error(`${bot} Error:\n`, e.message + '\n', [e]);
+		error(bot, `Error:\n`, e.message + '\n', [e]);
 		if (e.message == "LoggedInElsewhere" || e.message == "LogonSessionReplaced"){
 			$('#'+v.accountName+' .li-sub').html("In Game Elsewhere!");
 			return;
@@ -275,7 +296,7 @@ var newBot = function(bot,v){
 			});
 			v.request("https://steamcommunity.com/my/badges/?p="+v.g_Page, function(err, response, body) {
 				if(err || response.statusCode != 200) {
-					log("Couldn't request badge page: " + (err || "HTTP error " + response.statusCode) + ". Retrying in 10 seconds...");
+					error(bot, "Couldn't request badge page: " + (err || "HTTP error " + response.statusCode) + ". Retrying in 10 seconds...");
 					setTimeout(v.checkMinPlaytime, 10000);
 					return;
 				}
@@ -310,7 +331,7 @@ var newBot = function(bot,v){
 
 					// Check if app is owned
 					if(!v.client.picsCache.apps.hasOwnProperty(appid)) {
-						log("Skipping app " + appid + " \"" + name + "\", not owned");
+						debug(bot, "Skipping app " + appid + " \"" + name + "\" - not owned");
 						return;
 					}
 
@@ -389,7 +410,7 @@ var newBot = function(bot,v){
 						} else {
 							v.g_OwnedApps = v.g_OwnedApps.concat(lowAppsToIdle);
 							new Notification("Steam Card Farmer: "+bot,{body:"Idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take " + (2 - minPlaytime) + " hours.",icon: v.avatar}).onclick = function(){this.close();};
-							console.log(bot+" idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take " + (2.0 - minPlaytime) + " hours.");
+							info(bot, "idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take " + (2.0 - minPlaytime) + " hours.");
 							$('#'+v.accountName+' .li-sub').html("Idling " + lowAppsToIdle.length + " app" + (lowAppsToIdle.length == 1 ? '' : 's') + " up to 2 hours.");
 							v.client.gamesPlayed(lowAppsToIdle);
 							$('#'+v.accountName+' .li-img img').attr("class","ingame");
@@ -406,7 +427,7 @@ var newBot = function(bot,v){
 		if(v.g_OwnedApps.length == 0 || count == 0) {
 			return;
 		}
-		log(bot+" Got notification of new inventory items: " + count + " new item" + (count == 1 ? '' : 's'));
+		info(bot, "Got notification of new inventory items: " + count + " new item" + (count == 1 ? '' : 's'));
 		v.checkCardApps();
 	});
 	v.checkCardApps = function() {
@@ -424,7 +445,7 @@ var newBot = function(bot,v){
 
 			v.request("https://steamcommunity.com/my/badges/?p="+v.g_Page, function(err, response, body) {
 				if(err || response.statusCode != 200) {
-					log(bot+" couldn't request badge page: " + (err || "HTTP error " + response.statusCode));
+					error(bot, "couldn't request badge page: " + (err || "HTTP error " + response.statusCode));
 					v.checkCardsInSeconds(30);
 					return;
 				}
@@ -460,7 +481,7 @@ var newBot = function(bot,v){
 						var title = $_(infolines[i]).closest('.badge_row').find('.badge_title');
 						title.find('.badge_view_details').remove();
 						title = title.text().trim();
-						console.log(bot+" idling \"" + title + "\"\n" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining");
+						info(bot, "idling \"" + title + "\"\n" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining");
 						$('#'+v.accountName+' .li-sub').html("Idling " + title + "<br>" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining").onclick = function(){this.close();};
 						new Notification("Steam Card Farmer "+bot,{body:"Idling \"" + title + "\"\n" + match[1] + " drop" + (match[1] == 1 ? '' : 's') + " remaining",icon: v.avatar}).onclick = function(){this.close();};
 						v.client.gamesPlayed(["Farming Steam Cards",parseInt(appid, 10)]);
@@ -468,18 +489,19 @@ var newBot = function(bot,v){
 					}
 				}
 				//fadeout loading window
-				console.log(bot+" " + totalDropsLeft + " card drop" + (totalDropsLeft == 1 ? '' : 's') + " remaining across " + appsWithDrops + " app" + (appsWithDrops == 1 ? '' : 's') + " (Page " + v.g_Page + ")");
+				debug(bot, totalDropsLeft + " card drop" + (totalDropsLeft == 1 ? '' : 's') + " remaining across " + appsWithDrops + " app" + (appsWithDrops == 1 ? '' : 's') + " (Page " + v.g_Page + ")");
 				if(totalDropsLeft == 0) {
 					if ($_('.badge_row').length == 150){
-						log(bot+" no drops remaining on page "+v.g_Page);
+						debug(bot, "no drops remaining on page "+v.g_Page);
 						v.g_Page++;
-						log(bot+" checking page "+v.g_Page);
+						debug(bot, "checking page "+v.g_Page);
 						v.checkMinPlaytime();
 					} else {
-						new Notification("Steam Card Farmer: "+bot,{body:"All card drops recieved!",icon: v.avatar}).onclick = function(){this.close();};
-						$('#'+v.accountName+' .li-img img').attr("class","ingame");
-						$('#'+v.accountName+' .li-sub').html("Idling Hours<br>All card drops recieved!");
+						new Notification("Steam Card Farmer: "+bot,{body:"All card drops recieved!", icon: v.avatar}).onclick = function(){this.close();};
+						$('#'+v.accountName+' .li-img img').attr("class", "ingame");
+						$('#'+v.accountName+' .li-sub').html("Idling Hours<br\>All card drops recieved!");
 						v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep",440,570,730,365670,452780,466170,452780]);
+						info(bot, 'All card drops recieved! Idling hours for default apps.');
 					}
 				} else {
 					v.checkCardsInSeconds(1200); // 20 minutes to be safe, we should automatically check when Steam notifies us that we got a new item anyway
@@ -488,7 +510,7 @@ var newBot = function(bot,v){
 		});
 	}
 
-	v.checkCardsInSeconds = function(seconds) {
+	v.checkCardsInSeconds = function(seconds = 1200) {
     clearTimeout(v.g_CheckTimer);
 		v.g_CheckTimer = setTimeout(v.checkCardApps, (1000 * seconds));
 	}
@@ -542,6 +564,7 @@ var shutdown = function(code=0) {
 		process.exit(code);
 	}, 500);
 }
+
 //Right click menu
 mainmenu = new gui.Menu();
 mainmenu.append(new gui.MenuItem({
