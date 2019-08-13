@@ -151,13 +151,13 @@ class Bot {
 
   loggedOn(){
     this.info('Logged into Steam!');
-     this.client.setPersona(SteamUser.EPersonaState[this.state]);
-     this.client.setUIMode(1);
-     $(`#${this.nickname} .li-sub`).html('Logged into Steam!');
-     $(`#${this.nickname} .li-img img`).attr('class', 'online');
-     this.debug('Waiting for license info...');
-     this.debug('Steam client object:', this.client);
-   }
+    this.client.setPersona(SteamUser.EPersonaState[this.state]);
+    this.client.setUIMode(1);
+    $(`#${this.nickname} .li-sub`).html('Logged into Steam!');
+    $(`#${this.nickname} .li-img img`).attr('class', 'online');
+    this.debug('Waiting for license info...');
+    this.debug('Steam client object:', this.client);
+  }
 
   accountInfo(displayName) {
     this.displayName = displayName;
