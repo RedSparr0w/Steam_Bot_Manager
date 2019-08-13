@@ -5,7 +5,8 @@ const TradeOfferManager = require('steam-tradeoffer-manager');
 const request = require('request');
 const Cheerio = require('cheerio');
 const fs = require('fs');
-const gui = require('nw.gui'); //or global.window.nwDispatcher.requireNwGui() (see https://github.com/rogerwang/node-webkit/issues/707)
+const gui = global.gui; //or global.window.nwDispatcher.requireNwGui() (see https://github.com/rogerwang/node-webkit/issues/707)
+console = global.console;
 
 // Get the current window
 const win = gui.Window.get();
@@ -59,7 +60,11 @@ class Bot {
       return;
     }
 
+		this.username = username;
+		this.password = password;
     this.nickname = nickname;
+		if (shared_secret) this.shared_secret = shared_secret;
+		if (identity_secret) this.shared_secret = identity_secret;
     this.state = state;
 
     // Start the initial run
@@ -76,18 +81,20 @@ class Bot {
     });
     this.community = new SteamCommunity();
 
-  	return this.client.logOn({
+		this.debug('Logging in..');
+
+  	this.client.logOn({
       accountName,
       password,
     });
 
-    this.client.on('steamGuard', this.steamGuard);
-    this.client.on('loggedOn', this.loggedOn);
-    this.client.once('accountInfo', this.accountInfo);
-    this.client.on('webSession', this.webSession);
-    this.client.on('appOwnershipCached', this.appOwnershipCached);
-    this.client.on('error', this.error);
-    this.client.on('friendMessage', this.friendMessage);
+		this.client.on('steamGuard', (...args)=>this.steamGuard(...args));
+		this.client.on('loggedOn', (...args)=>this.loggedOn(...args));
+		this.client.once('accountInfo', (...args)=>this.accountInfo(...args));
+		this.client.on('webSession', (...args)=>this.webSession(...args));
+		this.client.on('appOwnershipCached', (...args)=>this.appOwnershipCached(...args));
+		this.client.on('error', (...args)=>this.clientError(...args));
+		this.client.on('friendMessage', (...args)=>this.friendMessage(...args));
     /*
     this.client.on('error', this.error);
     this.client.on('error', this.error);
@@ -115,14 +122,16 @@ class Bot {
    *  CLIENT EVENTS - START
    */
   steamGuard(domain, callback, lastcode){
+		this.debug('need steam guard code');
     if (domain){
       auth_msg = `[${this.nickname}]\n\nAuth Code\nEmailed to address *******@${domain}:`;
     } else if( this.shared_secret && !lastcode ){
-      return callback(SteamUser.generateAuthCode(this.shared_secret));
+      callback(SteamUser.generateAuthCode(this.shared_secret));
+			return;
     }else {
       auth_msg = `[${this.nickname}]\n\nMobile Auth code:`;
     }
-    return callback(prompt(auth_msg));
+    callback(prompt(auth_msg));
   }
 
   loggedOn(){
@@ -243,14 +252,17 @@ class Bot {
 		this.checkMinPlaytime(true);
 	}
 
-  error(err) {
+  clientError(e) {
 		$(`#${this.nickname} .li-img img`).attr('class', 'offline');
 		this.error(e.message + '\n', e);
 		if (e.message == 'LoggedInElsewhere' || e.message == 'LogonSessionReplaced'){
-			$(`#${this.nickname} .li-sub`).html('In Game Elsewhere!');
-		}else{
-			$(`#${this.nickname} .li-sub`).html('Offline!');
+			return $(`#${this.nickname} .li-sub`).html('In Game Elsewhere!');
 		}
+		if (e.message == 'RateLimitExceeded'){
+			this.logOff('RateLimitExceeded\nToo many login attempts!\nTry again soon..');
+			return $(`#${this.nickname} .li-sub`).html('Too many login attempts!\nTry again soon..');
+		}
+		$(`#${this.nickname} .li-sub`).html('Offline!');
 	}
 
   friendMessage(steamID, message){
