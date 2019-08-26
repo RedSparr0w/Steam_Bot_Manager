@@ -61,10 +61,14 @@ var newBot = function(bot,v){
 		"language": "en" // We want English item descriptions
 	});
 	v.community = new SteamCommunity();
-	v.client.logOn({
-      accountName: v.username,
-      password: v.password,
-    });
+
+  v.logIn = ()=>{
+  	v.client.logOn({
+        accountName: v.username,
+        password: v.password,
+      });
+  }
+  v.login();
 
 	v.client.on('webSession', function(sessionID, cookies) {
 		v.manager.setCookies(cookies, function(err) {
@@ -278,9 +282,16 @@ var newBot = function(bot,v){
 		error(bot, `Error:\n`, e.message + '\n', [e]);
 		if (e.message == "LoggedInElsewhere" || e.message == "LogonSessionReplaced"){
 			$('#'+v.username+' .li-sub').html("In Game Elsewhere!");
+			setTimeout(()=>{
+				v.checkMinPlaytime();
+			}, 30 * 6e4 /* 30 minutes */);
 			return;
 		}else{
+      v.logOff();
 			$('#'+v.username+' .li-sub').html("Offline!");
+			setTimeout(()=>{
+				v.logIn();
+			}, 30 * 6e4 /* 30 minutes */);
 		}
 	});
 
@@ -289,6 +300,14 @@ var newBot = function(bot,v){
 		$('#'+v.username+' .li-sub').html("Checking app playtime...");
 		v.client.webLogOn();
 		v.client.once('webSession', function(sessionID, cookies) {
+      const ownedPackages = v.client.licenses.map(function(license) {
+        let pkg = v.client.picsCache.packages[license.package_id].packageinfo;
+        pkg.time_created = license.time_created;
+        pkg.payment_method = license.payment_method;
+        return pkg;
+      }).filter(function(pkg) {
+        return !(pkg.extended && pkg.extended.freeweekend);
+      });
 			cookies.forEach(function(cookie) {
 				v.g_Jar.setCookie(cookie, 'https://steamcommunity.com');
 			});
@@ -300,14 +319,6 @@ var newBot = function(bot,v){
 				}
 
 				var lowHourApps = [];
-				var ownedPackages = v.client.licenses.map(function(license) {
-					var pkg = v.client.picsCache.packages[license.package_id].packageinfo;
-					pkg.time_created = license.time_created;
-					pkg.payment_method = license.payment_method;
-					return pkg;
-				}).filter(function(pkg) {
-					return !(pkg.extended && pkg.extended.freeweekend);
-				});
 				$_ = Cheerio.load(body);
 				$_('.badge_row').each(function() {
 					var row = $_(this);
