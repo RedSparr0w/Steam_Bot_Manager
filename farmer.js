@@ -529,7 +529,7 @@ var newBot = function(bot, v) {
             }).onclick = function() {
               this.close();
             };
-            v.client.gamesPlayed({game_extra_info: 'Farming Steam Cards', game_id: +appid}, true);
+            v.client.gamePlayed({game_extra_info: 'Farming Steam Cards', game_id: +appid}, true);
             $('#' + v.username + ' .li-img img').attr("class", "ingame");
           }
         }
@@ -550,7 +550,7 @@ var newBot = function(bot, v) {
             };
             $('#' + v.username + ' .li-img img').attr("class", "ingame");
             $('#' + v.username + ' .li-sub').html("Idling Hours<br\>All card drops received!");
-            v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep", 440, 570, 730, 365670, 452780, 466170, 452780]);
+            v.client.gamesPlayed(["Nothing.\nJust Doing Bot Things,\nbeep boop beep", 440, 570, 730, 365670, 452780, 466170, 452780], true);
             info(bot, 'All card drops received! Idling hours for default apps.');
           }
         } else {
