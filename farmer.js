@@ -73,7 +73,7 @@ var newBot = function(bot, v) {
       password: v.password,
     });
   }
-  v.login();
+  v.logIn();
 
   v.client.on('webSession', function(sessionID, cookies) {
     v.manager.setCookies(cookies, function(err) {
