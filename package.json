@@ -4,11 +4,11 @@
   "description": "Steam Bot Manager | Automatically farms card drops for Steam games you own with remaining drops | Accept trades | Redeem keys",
   "dependencies": {
     "cheerio": "^0.18.0",
-    "steam-user": "^3.9.0",
-    "steam-client": "^1.1.1",
+    "request": "^2.51.0",
+    "steam-client": "^2.5.8",
     "steam-tradeoffer-manager": "^2.1.0",
-    "steamcommunity": "^3.21.2",
-    "request": "^2.51.0"
+    "steam-user": "^3.9.0",
+    "steamcommunity": "^3.21.2"
   },
   "license": "MIT",
   "scripts": {
