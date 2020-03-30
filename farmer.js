@@ -430,10 +430,10 @@ var newBot = function(bot, v) {
             }
           });
 
-          var lowAppsToIdle = [];
+          let lowAppsToIdle = [];
 
           lowAppsToIdle = lowHourApps.map(function(app) {
-            return app.appid;
+            return { game_id: +app.appid };
           });
           startErUp();
 
@@ -529,7 +529,7 @@ var newBot = function(bot, v) {
             }).onclick = function() {
               this.close();
             };
-            v.client.gamesPlayed(["Farming Steam Cards", parseInt(appid, 10)]);
+            v.client.gamesPlayed({game_extra_info: 'Farming Steam Cards', game_id: +appid}, true);
             $('#' + v.username + ' .li-img img').attr("class", "ingame");
           }
         }
@@ -653,5 +653,5 @@ $(document).on('contextmenu', function(ev) {
 });
 
 bots.forEach(bot => {
-  newBot(bot.nickname, bot);
+  newBot(bot.nickname || bot.username, bot);
 });
