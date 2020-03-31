@@ -1,0 +1,46 @@
+<html>
+<head>
+	<title>Steam Card Farmer</title>
+	<script>setTimeout(function () {}).__proto__.unref = function () {}</script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<!-- Normalize CSS -->
+	<link rel="stylesheet" href="./include/css/normalize.css">
+	<!-- Fort Awesome CSS -->
+	<link rel="stylesheet" href="./include/css/font-awesome.min.css">
+	<link rel="stylesheet" href="./include/css/main.css">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</head>
+<body style="-webkit-user-select: none;">
+	<div id="Menu">
+		<div id="WindowDragable" style="-webkit-app-region: drag;">
+			<h4><i class="fa fa-steam"></i> Card Farmer</h4>
+		</div>
+		<div id="Controls">
+			<a href="#" id="AppLogout" onclick="client.logOff();location.reload();" style="right:56px;">
+				<i class="fa fa-sign-out"></i>
+			</a>
+			<a href="#" id="AppSettings" onclick="debugger;" style="right:30px;">
+				<i class="fa fa-cog"></i>
+			</a>
+			<a href="#" id="AppClose" onclick="process.exit(0);" style="right:0px;">
+				<i class="fa fa-times"></i>
+			</a>
+		</div>
+	</div>
+	<div id="MultiAppsWindow" class="Window">
+		<div id="pattern" class="pattern">
+			<ul class="list img-list">
+
+			</ul>
+		</div>
+	</div>
+	<script src="./farmer.js"></script>
+	<script>
+	(function() {
+		$("#NewItems").tooltip();
+	})();
+	</script>
+</body>
+</html>
