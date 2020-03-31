@@ -182,13 +182,14 @@ const newBot = function(bot, v) {
     */
   });
 
-  if (fs.existsSync(`polldata/${bot}_polldata.json`)) {
-    v.manager.pollData = JSON.parse(fs.readFileSync(`polldata/${bot}_polldata.json`));
-  }
-
-  v.manager.on('pollData', function(pollData) {
-    fs.writeFile(`polldata/${bot}_polldata.json`, JSON.stringify(pollData));
-  });
+  // TODO: fixup
+  // if (fs.existsSync(`polldata/${bot}_polldata.json`)) {
+  //   v.manager.pollData = JSON.parse(fs.readFileSync(`polldata/${bot}_polldata.json`));
+  // }
+  //
+  // v.manager.on('pollData', function(pollData) {
+  //   fs.writeFile(`polldata/${bot}_polldata.json`, JSON.stringify(pollData));
+  // });
 
   v.client.on('steamGuard', function(domain, callback, lastcode) {
     if (domain != null) {
@@ -662,3 +663,7 @@ const shutdown = (code = 0) => {
 bots.forEach(bot => {
   newBot(bot.nickname || bot.username, bot);
 });
+
+(function() {
+  $('#NewItems').tooltip();
+})();

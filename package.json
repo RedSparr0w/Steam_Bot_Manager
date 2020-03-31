@@ -3,7 +3,10 @@
   "version": "2.0.1",
   "description": "Steam Bot Manager | Automatically farms card drops for Steam games you own with remaining drops | Accept trades | Redeem keys",
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "cheerio": "^0.18.0",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.16.1",
     "request": "^2.51.0",
     "steam-client": "^2.5.8",
     "steam-totp": "^2.1.1",

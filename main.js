@@ -10,6 +10,8 @@ const createWindow = () => {
   let mainWindow = new BrowserWindow({
     width: 350,
     height: 450,
+    min_height: 450,
+    max_width: 350,
     //show: false,
     backgroundColor: '#222f3e',
     frame: false,
@@ -25,7 +27,7 @@ const createWindow = () => {
   mainWindow.setVisibleOnAllWorkspaces(true);
 
   // Load the main webpage
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('src/index.html');
 
   // Hide until window has mostly loaded content
   mainWindow.once('ready-to-show', () => {
