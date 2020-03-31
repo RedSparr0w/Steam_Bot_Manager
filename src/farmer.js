@@ -205,9 +205,9 @@ const newBot = function(bot, v) {
   v.client.on('loggedOn', function() {
     v.client.setPersona(1);
     v.client.setUIMode(1);
-    // $(`#${v.username} .li-sub`).html('Logged into Steam!');
+    $(`#${v.username} .li-sub`).html('Logged into Steam!');
     info(bot, 'Logged into Steam!');
-    // $(`#${v.username} .li-img img`).attr('class', 'online');
+    $(`#${v.username} .li-img img`).attr('class', 'online');
     debug(bot, 'Waiting for license info...');
     debug(bot, v.client);
   });
@@ -222,21 +222,22 @@ const newBot = function(bot, v) {
     v.community.getSteamUser(v.client.steamID, (err, data) => {
       v.avatar = `http://cdn.akamai.steamstatic.com/steamcommunity/public/images/avatars/5f/${data.avatarHash}_full.jpg`;
       v.name = name;
-      // $('#MultiAppsWindow').show().find('ul').append(`<li id="${v.username}"><div class="li-img"><img src="${v.avatar}" alt="${name}" /></div><div class="li-text"><h4 class="li-head">${name}</h4><p class="li-sub"></p></div></li>`);
+      $('#MultiAppsWindow').show().find('ul').append(`<li id="${v.username}"><div class="li-img"><img src="${v.avatar}" alt="${name}" /></div><div class="li-text"><h4 class="li-head">${name}</h4><p class="li-sub"></p></div></li>`);
       if (v.shared_secret) {
         // TODO: electron convert
-        // $(`#${v.username} img`).click(function() {
-        //   const AuthCode = SteamTotp.generateAuthCode(v.shared_secret);
-        //   // clipboard.set(AuthCode);
-        //   new Notification(`${name} Auth Code:`, {
-        //     body: `${AuthCode} (copied to clipboard)`,
-        //     icon: v.avatar,
-        //   }).onclick = function() {
-        //     this.close();
-        //   };
-        // });
+        $(`#${v.username} img`).click(function() {
+          const AuthCode = SteamTotp.generateAuthCode(v.shared_secret);
+          // TODO: convert to electron
+          // copy(AuthCode);
+          new Notification(`${name} Auth Code:`, {
+            body: `${AuthCode} (copied to clipboard)`,
+            icon: v.avatar,
+          }).onclick = function() {
+            this.close();
+          };
+        });
       }
-      // $(`#${v.username} .li-img img`).attr('class', 'online');
+      $(`#${v.username} .li-img img`).attr('class', 'online');
       // TODO: electron convert
       //Setup Bot Menu
       // v.menu = new gui.Menu();
@@ -308,17 +309,17 @@ const newBot = function(bot, v) {
   });
 
   v.client.on('error', function(e) {
-    // $(`#${v.username} .li-img img`).attr('class', 'offline');
+    $(`#${v.username} .li-img img`).attr('class', 'offline');
     error(bot, 'Error:\n', `${e.message}\n`, [e]);
     if (e.message == 'LoggedInElsewhere' || e.message == 'LogonSessionReplaced') {
-      // $(`#${v.username} .li-sub`).html('In Game Elsewhere!');
+      $(`#${v.username} .li-sub`).html('In Game Elsewhere!');
       setTimeout(() => {
         v.checkMinPlaytime();
       }, 30 * 6e4 /* 30 minutes */ );
       return;
     } else {
       v.logOff();
-      // $(`#${v.username} .li-sub`).html('Offline!');
+      $(`#${v.username} .li-sub`).html('Offline!');
       setTimeout(() => {
         v.logIn();
       }, 30 * 6e4 /* 30 minutes */ );
@@ -326,8 +327,8 @@ const newBot = function(bot, v) {
   });
 
   v.checkMinPlaytime = function() {
-    // $(`#${v.username} .li-img img`).attr('class', 'online');
-    // $(`#${v.username} .li-sub`).html('Checking app playtime...');
+    $(`#${v.username} .li-img img`).attr('class', 'online');
+    $(`#${v.username} .li-sub`).html('Checking app playtime...');
     v.client.webLogOn();
     v.client.once('webSession', function(sessionID, cookies) {
       const ownedPackages = v.client.licenses.map(function(license) {
@@ -457,9 +458,9 @@ const newBot = function(bot, v) {
                 this.close();
               };
               info(bot, `idling ${lowAppsToIdle.length} app${lowAppsToIdle.length == 1 ? '' : 's'} up to 2 hours.\nYou likely won't receive any card drops in this time.\nThis will take ${2.0 - minPlaytime} hours.`);
-              // $(`#${v.username} .li-sub`).html(`Idling ${lowAppsToIdle.length} app${lowAppsToIdle.length == 1 ? '' : 's'} up to 2 hours.`);
+              $(`#${v.username} .li-sub`).html(`Idling ${lowAppsToIdle.length} app${lowAppsToIdle.length == 1 ? '' : 's'} up to 2 hours.`);
               v.client.gamesPlayed(lowAppsToIdle);
-              // $(`#${v.username} .li-img img`).attr('class', 'ingame');
+              $(`#${v.username} .li-img img`).attr('class', 'ingame');
               v.checkCardsInSeconds(1000 * 60 * 60 * (2 - minPlaytime));
             }
           }
@@ -480,8 +481,8 @@ const newBot = function(bot, v) {
     if (v.g_CheckTimer) {
       clearTimeout(v.g_CheckTimer);
     }
-    // $(`#${v.username} .li-img img`).attr('class', 'online');
-    // $(`#${v.username} .li-sub`).html('Checking remaining card drops...');
+    $(`#${v.username} .li-img img`).attr('class', 'online');
+    $(`#${v.username} .li-sub`).html('Checking remaining card drops...');
 
     v.client.webLogOn();
     v.client.once('webSession', function(sessionID, cookies) {
@@ -528,9 +529,9 @@ const newBot = function(bot, v) {
             title.find('.badge_view_details').remove();
             title = title.text().trim();
             info(bot, `idling "${title}"\n${match[1]} drop${match[1] == 1 ? '' : 's'} remaining`);
-            // $(`#${v.username} .li-sub`).html(`Idling ${title}<br>${match[1]} drop${match[1] == 1 ? '' : 's'} remaining`).onclick = function() {
-            //   this.close();
-            // };
+            $(`#${v.username} .li-sub`).html(`Idling ${title}<br>${match[1]} drop${match[1] == 1 ? '' : 's'} remaining`).onclick = function() {
+              this.close();
+            };
             new Notification(`Steam Card Farmer ${bot}`, {
               body: `Idling "${title}"\n${match[1]} drop${match[1] == 1 ? '' : 's'} remaining`,
               icon: v.avatar,
@@ -538,7 +539,7 @@ const newBot = function(bot, v) {
               this.close();
             };
             v.client.gamePlayed({game_extra_info: 'Farming Steam Cards', game_id: +appid}, true);
-            // $(`#${v.username} .li-img img`).attr('class', 'ingame');
+            $(`#${v.username} .li-img img`).attr('class', 'ingame');
           }
         }
         //fadeout loading window
@@ -556,8 +557,8 @@ const newBot = function(bot, v) {
             }).onclick = function() {
               this.close();
             };
-            // $(`#${v.username} .li-img img`).attr('class', 'ingame');
-            // $(`#${v.username} .li-sub`).html('Idling Hours<br\>All card drops received!');
+            $(`#${v.username} .li-img img`).attr('class', 'ingame');
+            $(`#${v.username} .li-sub`).html('Idling Hours<br\>All card drops received!');
             v.client.gamesPlayed(['Nothing.\nJust Doing Bot Things,\nbeep boop beep', 440, 570, 730, 365670, 452780, 466170, 452780], true);
             info(bot, 'All card drops received! Idling hours for default apps.');
           }
@@ -577,12 +578,12 @@ const newBot = function(bot, v) {
     v.client.logOff();
     v.client.once('disconnected', function() {
       v.client = '';
-      // $(`#${v.username}`).remove();
+      $(`#${v.username}`).remove();
     });
 
     setTimeout(function() {
       v.client = '';
-      // $(`#${v.username}`).remove();
+      $(`#${v.username}`).remove();
     }, 500);
   };
 
