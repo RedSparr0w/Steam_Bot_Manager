@@ -1,20 +1,21 @@
 // Modules to control application life and create native browser window
-const electron = require('electron');
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow } = require('electron');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 const createWindow = () => {
-  let mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 350,
     height: 450,
-    min_height: 450,
-    max_width: 350,
+    minHeight: 450,
+    minWidth: 350,
+    maxWidth: 350,
     //show: false,
     backgroundColor: '#222f3e',
     frame: false,
+    icon: 'logo.ico',
     titleBarStyle: 'customButtonsOnHover',
     webPreferences: {
       nodeIntegration: true,
